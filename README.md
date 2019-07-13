@@ -1,190 +1,59 @@
-# Tensorflow Project Template
-A simple and well designed structure is essential for any Deep Learning project, so after a lot of practice and contributing in tensorflow projects here's a tensorflow project template that combines   **simplcity**, **best practice for folder structure** and **good OOP design**.
-The main idea is that there's much stuff you do every time you start your tensorflow project, so wrapping all this shared stuff will help you to change just the core idea every time you start a new tensorflow project.
+﻿# Keras Project Template [![CometML](https://img.shields.io/badge/comet.ml-track-brightgreen.svg)](https://www.comet.ml)
 
-**So, here's a simple tensorflow template that help you get into your main project faster and just focus on your core (Model, Training, ...etc)**
-# Table Of Contents
+A project template to simplify building and training deep learning models using Keras.
 
--  [In a Nutshell](#in-a-nutshell)
--  [In Details](#in-details)
-    -  [Project architecture](#project-architecture)
-    -  [Folder structure](#folder-structure)
-    -  [ Main Components](#main-components)
-        -  [Models](#models)
-        -  [Trainer](#trainer)
-        -  [Data Loader](#data-loader)
-        -  [Logger](#logger)
-        -  [Configuration](#configuration)
-        -  [Main](#main)
- -  [Future Work](#future-work)
- -  [Contributing](#contributing)
- -  [Acknowledgments](#acknowledgments)
+# Table of contents
 
-# In a Nutshell   
-In a nutshell here's how to use this template, so **for example** assume you want to implement VGG model so you should do the following:
--  In models folder create a class named VGG that inherit the "base_model" class
+- [Getting Started](#getting-started)
+- [Running The Demo Project](#running-the-demo-project)
+- [Comet.ml Integration](#cometml-integration)
+- [Template Details](#template-details)
+    - [Project Architecture](#project-architecture)
+    - [Folder Structure](#folder-structure)
+    - [Main Components](#main-components)
+- [Future Work](#future-work)
+- [Example Projects](#example-projects)
+- [Contributing](#contributing)
+- [Acknowledgements](#acknowledgements)
 
-```python
+# Getting Started
+This template allows you to simply build and train deep learning models with checkpoints and tensorboard visualization.
 
-    class VGGModel(BaseModel):
-        def __init__(self, config):
-            super(VGGModel, self).__init__(config)
-            #call the build_model and init_saver functions.
-            self.build_model() 
-            self.init_saver() 
-  ```
-- Override these two functions "build_model" where you implement the vgg model, and "init_saver" where you define a tensorflow saver, then call them in the initalizer.
-    
-```python
-     def build_model(self):
-        # here you build the tensorflow graph of any model you want and also define the loss.
-        pass
-            
-     def init_saver(self):
-        # here you initalize the tensorflow saver that will be used in saving the checkpoints.
-        self.saver = tf.train.Saver(max_to_keep=self.config.max_to_keep)
-
-  ```
-   
-- In trainers folder create a VGG trainer that inherit from "base_train" class
-```python
-
-    class VGGTrainer(BaseTrain):
-        def __init__(self, sess, model, data, config, logger):
-            super(VGGTrainer, self).__init__(sess, model, data, config, logger)
+In order to use the template you have to:
+1. Define a data loader class.
+2. Define a model class that inherits from BaseModel.
+3. Define a trainer class that inherits.
+4. Define a configuration file with the parameters needed in an experiment.
+5. Run the model using:
+```shell
+python main.py -c [path to configuration file]
 ```
-- Override these two functions "train_step", "train_epoch" where you write the logic of the training process
-```python
 
-    def train_epoch(self):
-        """
-       implement the logic of epoch:
-       -loop on the number of iterations in the config and call the train step
-       -add any summaries you want using the summary
-        """
-        pass
-
-    def train_step(self):
-        """
-       implement the logic of the train step
-       - run the tensorflow session
-       - return any metrics you need to summarize
-       """
-        pass
-
+# Running The Demo Project
+A simple model for the mnist dataset is available to test the template.
+To run the demo project:
+1. Start the training using:
+```shell
+python main.py -c configs/simple_mnist_config.json
 ```
-- In main file, you create the session and instances of the following objects "Model", "Logger", "Data_Generator", "Trainer", and config
-```python
-    sess = tf.Session()
-    # create instance of the model you want
-    model = VGGModel(config)
-    # create your data generator
-    data = DataGenerator(config)
-    # create tensorboard logger
-    logger = Logger(sess, config)
+2. Start Tensorboard visualization using:
+```shell
+tensorboard --logdir=experiments/simple_mnist/logs
 ```
-- Pass the all these objects to the trainer object, and start your training by calling "trainer.train()" 
-```python
-    trainer = VGGTrainer(sess, model, data, config, logger)
-
-    # here you train your model
-    trainer.train()
-
-```
-**You will find a template file and a simple example in the model and trainer folder that shows you how to try your first model simply.**
-
-
-# In Details
-
-Project architecture 
---------------
 
 <div align="center">
 
-<img align="center" hight="600" width="600" src="https://github.com/Mrgemy95/Tensorflow-Project-Templete/blob/master/figures/diagram.png?raw=true">
+<img align="center" width="600" src="https://github.com/Ahmkel/Keras-Project-Template/blob/master/figures/Tensorboard_demo.PNG?raw=true">
 
 </div>
 
+# Comet.ml Integration
+This template also supports reporting to Comet.ml which allows you to see all your hyper-params, metrics, graphs, dependencies and more including real-time metric.
 
-Folder structure
---------------
-
-```
-├──  base
-│   ├── base_model.py   - this file contains the abstract class of the model.
-│   └── base_train.py   - this file contains the abstract class of the trainer.
-│
-│
-├── model               - this folder contains any model of your project.
-│   └── example_model.py
-│
-│
-├── trainer             - this folder contains trainers of your project.
-│   └── example_trainer.py
-│   
-├──  mains              - here's the main(s) of your project (you may need more than one main).
-│    └── example_main.py  - here's an example of main that is responsible for the whole pipeline.
-
-│  
-├──  data _loader  
-│    └── data_generator.py  - here's the data_generator that is responsible for all data handling.
-│ 
-└── utils
-     ├── logger.py
-     └── any_other_utils_you_need
-
-```
+Add your API key [in the configuration file](configs/simple_mnist_config.json#L15):
 
 
-## Main Components
-
-### Models
---------------
-- #### **Base model**
-    
-    Base model is an abstract class that must be Inherited by any model you create, the idea behind this is that there's much shared stuff between all models.
-    The base model contains:
-    - ***Save*** -This function to save a checkpoint to the desk. 
-    - ***Load*** -This function to load a checkpoint from the desk.
-    - ***Cur_epoch, Global_step counters*** -These variables to keep track of the current epoch and global step.
-    - ***Init_Saver*** An abstract function to initialize the saver used for saving and loading the checkpoint, ***Note***: override this function in the model you want to implement.
-    - ***Build_model*** Here's an abstract function to define the model, ***Note***: override this function in the model you want to implement.
-- #### **Your model**
-    Here's where you implement your model.
-    So you should :
-    - Create your model class and inherit the base_model class
-    - override "build_model" where you write the tensorflow model you want
-    - override "init_save" where you create a tensorflow saver to use it to save and load checkpoint
-    - call the "build_model" and "init_saver" in the initializer.
-
-### Trainer
---------------
-- #### **Base trainer**
-    Base trainer is an abstract class that just wrap the training process.
-    
-- #### **Your trainer**
-     Here's what you should implement in your trainer.
-    1. Create your trainer class and inherit the base_trainer class.
-    2. override these two functions "train_step", "train_epoch" where you implement the training process of each step and each epoch.
-### Data Loader
-This class is responsible for all data handling and processing and provide an easy interface that can be used by the trainer.
-### Logger
-This class is responsible for the tensorboard summary, in your trainer create a dictionary of all tensorflow variables you want to summarize then pass this dictionary to logger.summarize().
-
-
-This class also supports reporting to **Comet.ml** which allows you to see all your hyper-params, metrics, graphs, dependencies and more including real-time metric.
-Add your API key [in the configuration file](configs/example.json#L9):
-
-For example: "comet_api_key": "your key here"
-
-
-### Comet.ml Integration
-This template also supports reporting to Comet.ml which allows you to see all your hyper-params, metrics, graphs, dependencies and more including real-time metric. 
-
-Add your API key [in the configuration file](configs/example.json#L9):
-
-
-For example:  `"comet_api_key": "your key here"` 
+For example:  `"comet_api_key": "your key here"`
 
 Here's how it looks after you start training:
 <div align="center">
@@ -193,31 +62,123 @@ Here's how it looks after you start training:
 
 </div>
 
-You can also link your Github repository to your comet.ml project for full version control. 
-[Here's a live page showing the example from this repo](https://www.comet.ml/gidim/tensorflow-project-template/caba580d8d1547ccaed982693a645507/chart)
+You can also link your Github repository to your comet.ml project for full version control.
 
 
+# Template Details
 
-### Configuration
-I use Json as configuration method and then parse it, so write all configs you want then parse it using "utils/config/process_config" and pass this configuration object to all other objects.
+## Project Architecture
+
+<div align="center">
+
+<img align="center" width="600" src="https://github.com/Ahmkel/Keras-Project-Template/blob/master/figures/ProjectArchitecture.jpg?raw=true">
+
+</div>
+
+
+## Folder Structure
+
+```
+├── main.py             - here's an example of main that is responsible for the whole pipeline.
+│
+│
+├── base                - this folder contains the abstract classes of the project components
+│   ├── base_data_loader.py   - this file contains the abstract class of the data loader.
+│   ├── base_model.py   - this file contains the abstract class of the model.
+│   └── base_train.py   - this file contains the abstract class of the trainer.
+│
+│
+├── model               - this folder contains the models of your project.
+│   └── simple_mnist_model.py
+│
+│
+├── trainer             - this folder contains the trainers of your project.
+│   └── simple_mnist_trainer.py
+│
+|
+├── data_loader         - this folder contains the data loaders of your project.
+│   └── simple_mnist_data_loader.py
+│
+│
+├── configs             - this folder contains the experiment and model configs of your project.
+│   └── simple_mnist_config.json
+│
+│
+├── datasets            - this folder might contain the datasets of your project.
+│
+│
+└── utils               - this folder contains any utils you need.
+     ├── config.py      - util functions for parsing the config files.
+     ├── dirs.py        - util functions for creating directories.
+     └── utils.py       - util functions for parsing arguments.
+```
+
+
+## Main Components
+
+### Models
+You need to:
+1. Create a model class that inherits from **BaseModel**.
+2. Override the ***build_model*** function which defines your model.
+3. Call ***build_model*** function from the constructor.
+
+
+### Trainers
+You need to:
+1. Create a trainer class that inherits from **BaseTrainer**.
+2. Override the ***train*** function which defines the training logic.
+
+**Note:** To add functionalities after each training epoch such as saving checkpoints or logs for tensorboard using Keras callbacks:
+1. Declare a callbacks array in your constructor.
+2. Define an ***init_callbacks*** function to populate your callbacks array and call it in your constructor.
+3. Pass the callbacks array to the ***fit*** function on the model object.
+
+**Note:** You can use ***fit_generator*** instead of ***fit*** to support generating new batches of data instead of loading the whole dataset at one time.
+
+### Data Loaders
+You need to:
+1. Create a data loader class that inherits from **BaseDataLoader**.
+2. Override the ***get_train_data()*** and the ***get_test_data()*** functions to return your train and test dataset splits.
+
+**Note:** You can also define a different logic where the data loader class has a function ***get_next_batch*** if you want the data reader to read batches from your dataset each time.
+
+### Configs
+You need to define a .json file that contains your experiment and model configurations such as the experiment name, the batch size, and the number of epochs.
+
+
 ### Main
-Here's where you combine all previous part.
-1. Parse the config file.
-2. Create a tensorflow session.
-2. Create an instance of "Model", "Data_Generator" and "Logger" and parse the config to all of them.
-3. Create an instance of "Trainer" and pass all previous objects to it.
-4. Now you can train your model by calling "Trainer.train()"
+Responsible for building the pipeline.
+1. Parse the config file
+2. Create an instance of your data loader class.
+3. Create an instance of your model class.
+4. Create an instance of your trainer class.
+5. Train your model using ".Train()" function on the trainer object.
+
+### From Config
+We can now load models without having to explicitly create an instance of each class. Look at:
+1. from_config.py: this can load any config file set up to point to the right modules/classes to import
+2. Look at configs/simple_mnist_from_config.json to get an idea of how this works from the config. Run it with:
+```shell
+python from_config.py -c configs/simple_mnist_from_config.json
+```
+3. See conv_mnist_from_config.json (and the additional data_loader/model) to see how easy it is to run a different experiment with just a different config file:
+```shell
+python from_config.py -c configs/conv_mnist_from_config.json
+```
+
+# Example Projects
+* [Toxic comments classification using Convolutional Neural Networks and Word Embedding](https://github.com/Ahmkel/Toxic-Comments-Competition-Kaggle)
 
 
 # Future Work
-- Replace the data loader part with new tensorflow dataset API.
+Create a command line tool for Keras project scaffolding where the user defines a data loader, a model, a trainer and runs the tool to generate the whole project. (This is somewhat complete now by loading each of these from the config)
 
 
 # Contributing
-Any kind of enhancement or contribution is welcomed.
+Any contributions are welcome including improving the template and example projects.
+
+# Acknowledgements
+This project template is based on [MrGemy95](https://github.com/MrGemy95)'s [Tensorflow Project Template](https://github.com/MrGemy95/Tensorflow-Project-Template).
 
 
-# Acknowledgments
-Thanks for my colleague  [Mo'men Abdelrazek](https://github.com/moemen95) for contributing in this work.
-and thanks for [Mohamed Zahran](https://github.com/moh3th1) for the review.
-**Thanks for Jtoy for including the repo in  [Awesome Tensorflow](https://github.com/jtoy/awesome-tensorflow).** 
+Thanks for my colleagues [Mahmoud Khaled](https://github.com/MahmoudKhaledAli), [Ahmed Waleed](https://github.com/Rombux) and [Ahmed El-Gammal](https://github.com/AGammal) who worked on the initial project that spawned this template.
